@@ -2,12 +2,24 @@ const admin = require('./adminSchema')
 
 const multer = require('multer')
 
+// const storage = multer.diskStorage({
+//   destination: function (req, res, cb) {
+//     cb(null, "./upload");
+//   },
+//   filename: function (req, file, cb) {
+//     cb(null, file.originalname);
+//   },
+// });
 const storage = multer.diskStorage({
   destination: function (req, res, cb) {
     cb(null, "./upload");
   },
   filename: function (req, file, cb) {
-    cb(null, file.originalname);
+    const uniquePrefix = 'prefix-'; // Add your desired prefix here
+    const originalname = file.originalname;
+    const extension = originalname.split('.').pop();
+    const filename = uniquePrefix + originalname.substring(0, originalname.lastIndexOf('.')) + '-' + Date.now() + '.' + extension;
+    cb(null, filename);
   },
 });
 

@@ -2,14 +2,27 @@ const rentalSchema = require('../Rentals/rentalSchema');
 const Book = require('./bookSchema');
 const multer = require('multer')
 
+// const storage = multer.diskStorage({
+//   destination: function (req, res, cb) {
+//     cb(null, "./upload");
+//   },
+//   filename: function (req, file, cb) {
+//     cb(null, file.originalname+new Date());
+//   },
+// });
 const storage = multer.diskStorage({
   destination: function (req, res, cb) {
     cb(null, "./upload");
   },
   filename: function (req, file, cb) {
-    cb(null, file.originalname);
+    const uniquePrefix = 'prefix-'; // Add your desired prefix here
+    const originalname = file.originalname;
+    const extension = originalname.split('.').pop();
+    const filename = uniquePrefix + originalname.substring(0, originalname.lastIndexOf('.')) + '-' + Date.now() + '.' + extension;
+    cb(null, filename);
   },
 });
+
 
 const upload = multer({ storage: storage }).single("image");
 const addBook = (req, res) => {
