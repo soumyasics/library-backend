@@ -46,5 +46,4 @@ router.post('/addNotifications',rentals.addNotifications)
 router.post('/viewNotificationByUserid',rentals.viewNotificationByUserid)
 
 router.post('/UpdateFine',rentals.UpdateFine)
-
 module.exports=router
