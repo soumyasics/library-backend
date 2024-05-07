@@ -26,19 +26,31 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage }).single("image");
 //User Registration 
 
-const addAdminDetails = (req, res) => {
+const addAdminDetails = async(req, res) => {
+let newAdmin=false
 
-console.log(req.file)
+let imgUrl=null
+if(req.file!=null){
+  imgUrl=`http://hybrid.srishticampus.in:4010/${req.file.filename}`
+}
+
+  const admindata = await admin.find({ }).exec().then(datas=>{
+
+ 
+  if(datas.length<=0)
+  newAdmin=true
+})
   const newUser = new admin({
     name: req.body.name,
     phone: req.body.phone,
-    password: req.body.password,
+    // password: req.body.password,
     email: req.body.email,
     image: req.file,
-    imgUrl:`http://hybrid.srishticampus.in:4010${req.file.filename}`
+    imgUrl:imgUrl
 
   })
-  newUser.save().then(data => {
+  if(newAdmin==true){
+  await newUser.save().then(data => {
     res.json({
       status: 200,
       msg: "Inserted successfully",
@@ -53,6 +65,31 @@ console.log(req.file)
       data: err
     })
   })
+}else{
+  admin.findOneAndUpdate({ role: 'admin'}, {
+  
+    name: req.body.name,
+    phone: req.body.phone,
+    email: req.body.email,
+    image: req.file,
+    imgUrl:imgUrl
+
+
+  })
+    .exec().then(data => {
+
+      res.json({
+        status: 200,
+        msg: "Updated successfully"
+      })
+    }).catch(err => {
+      res.json({
+        status: 500,
+        msg: "Data not Updated",
+        Error: err
+      })
+    })
+}
 }
 //User Registration -- finished
 
