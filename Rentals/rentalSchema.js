@@ -27,6 +27,9 @@ const schema = mongoose.Schema({
     fine: {
         type: Number,
         default: 0
+    },returndate: {
+        type: Date
+
     }
 });
 module.exports = mongoose.model('rentals', schema)

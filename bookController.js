@@ -144,7 +144,7 @@ if(isRemovable){
 const searchBookByName = (req, res) => {
   const bname = req.query.name;
 
-  Book.find({ bookname: { $regex: new RegExp(bname, "i") }, quantity: { $gt: 0 } })
+  Book.find({ bookname: { $regex: new RegExp(bname, "i") } })
     .then((books) => {
       res.json({
         status: 200,
@@ -166,7 +166,7 @@ const searchBookByName = (req, res) => {
 const searchBookByCategory = (req, res) => {
   const category = req.query.category;
 
-  Book.find({ category: { $regex: new RegExp(category, "i") },quantity: { $gt: 0 }  })
+  Book.find({ category: { $regex: new RegExp(category, "i") }  })
     .then((books) => {
       res.json({
         status: 200,

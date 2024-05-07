@@ -65,10 +65,10 @@ if(status==true){
 
 
 const viewAllRentalss = async (req, res) => {
-    let datas = await rentals.find({ status: "assigned" });
-    await datas.map(x => {
-        checkFine(x._id)
-    })
+    // let datas = await rentals.find({ status: "assigned" });
+    // await datas.map(x => {
+    //     checkFine(x._id)
+    // })
     await rentals.find({ status: "assigned" }).populate('userid').populate('bookid')
         .then((books) => {
             res.status(200).json({
@@ -86,11 +86,11 @@ const viewAllRentalss = async (req, res) => {
 };
 
 const viewAllRentalsByUserId = async (req, res) => {
-    let datas = await rentals.find({userid:req.query.userid,status: "assigned" });
-    await datas.map(x => {
-        checkFine(x._id)
-    })
-    await rentals.find({userid:req.query.userid,status:"assigned" }).populate('userid').populate('bookid')
+    // let datas = await rentals.find({userid:req.query.userid});
+    // await datas.map(x => {
+    //     checkFine(x._id)
+    // })
+    await rentals.find({userid:req.query.userid}).populate('userid').populate('bookid')
         .then((books) => {
             res.status(200).json({
                 message: "Books retrieved successfully",
@@ -106,29 +106,37 @@ const viewAllRentalsByUserId = async (req, res) => {
         });
 };
 
-const checkFine = async (rentalid) => {
-    console.log("check fine called");
-    let currentDate = new Date()
-    let dueDate = new Date()
-    let fine = 0
-    await rentals.findById({ _id: rentalid }).exec().then(dataa => {
-        console.log(dataa.duedate);
-        dueDate = dataa.duedate
-    }).catch(err => {
-        console.log(err);
+const UpdateFine = async (req,res) => {
+    
+    // await rentals.findByIdandUpdate({ _id: req.query.rentalid},{fine:req.body.fine}).exec().then(dataa => {
+        
+    // }).catch(err => {
+    //     console.log(err);
+    // })
+    // console.log("curr", currentDate, dueDate);
+    // if (currentDate > dueDate) {
+    //     const diffTime = Math.abs(currentDate - dueDate);
+    //     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); // Difference in days
+    //     fine = diffDays * 10; // Fine rate is Rs 10 per day
+    //     console.log("diff", diffDays);
+    //     console.log("fine", fine);
+
+    // }
+    // console.log("fine", fine);
+
+    await rentals.findByIdAndUpdate({ _id: req.query.rentalid }, { fine: req.body.fine }).exec().then(data=>{
+        res.json({
+            status:200,
+            msg:"Updated Fine",
+            data:data
+        })
+    }).catch(err=>{
+        res.json({
+            status: 500,
+            msg: "No Data obtained",
+            data: err
+        })
     })
-    console.log("curr", currentDate, dueDate);
-    if (currentDate > dueDate) {
-        const diffTime = Math.abs(currentDate - dueDate);
-        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); // Difference in days
-        fine = diffDays * 10; // Fine rate is Rs 10 per day
-        console.log("diff", diffDays);
-        console.log("fine", fine);
-
-    }
-    console.log("fine", fine);
-
-    await rentals.findByIdAndUpdate({ _id: rentalid }, { fine: fine })
 
 }
 const deleteRentalById = (req, res) => {
@@ -163,7 +171,9 @@ const returnRentalBook = async (req, res) => {
     console.log("book", dataa);
     let count = dataa.quantity
     console.log("quantity", count);
-    rentals.findByIdAndUpdate({ _id: req.query.rentalid }, { status: 'returned' }).exec()
+    let curdate=new Date()
+    // await checkFine(req.query.rentalid)
+    rentals.findByIdAndUpdate({ _id: req.query.rentalid }, { status: 'returned', returndate:curdate}).exec()
         .then(data => {
             console.log(data);
             res.json({
@@ -219,7 +229,7 @@ const addreview =async (req, res) => {
 
 const addNotifications =async (req, res) => {
     let datas=null
-    await checkFine(req.query.rentalid)
+    // await checkFine(req.query.rentalid)
     await rentals.findById(req.query.rentalid).exec().then(data=>{
         datas=data
     }).catch(err=>{
@@ -342,5 +352,6 @@ module.exports = {
     addNotifications,
     viewAllReviewsbyBookId,
     viewAllReviewsbyUserId,
-    viewNotificationByUserid
+    viewNotificationByUserid,
+    UpdateFine
 }

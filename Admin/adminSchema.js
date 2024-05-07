@@ -20,7 +20,7 @@ const adminSchema=mongoose.Schema({
     },
     password:{
         type:String,
-        required:true,
+       
         default:'admin@123'
     },
     image:{
